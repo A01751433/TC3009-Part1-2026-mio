@@ -29,6 +29,26 @@ const API_BASE = `http://${window.location.hostname}:8080`;
 //   - lanzar un error si la respuesta no viene con codigo 200, para que la
 //     interfaz pueda mostrar el problema en lugar de quedarse en blanco
 
+async function get(path, params = {}) {
+  const url = new URL(API_BASE + path);
+  Object.entries(params).forEach(([clave, valor]) => {
+    if (valor !== null && valor !== undefined && valor !== "") {
+      url.searchParams.set(clave, valor);
+    }
+  });
+
+  const respuesta = await fetch(url);
+  if (!respuesta.ok) {
+    throw new Error(`${respuesta.status} al pedir ${path}`);
+  }
+  return respuesta.json();
+}
+
+export const getHealth = () => get("/api/health");
+export const getStats = (neighborhood) => get("/api/stats", { neighborhood });
+export const getData = (neighborhood, limit = 20) =>
+  get("/api/data", { neighborhood, limit });
+
 // TODO sesion 1: las tres funciones que consume App.jsx
 //
 //   getHealth()                      -> GET /api/health
